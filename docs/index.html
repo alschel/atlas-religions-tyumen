@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Атлас религиозного ландшафта Тюменской области</title>
+  <meta name="description" content="Сайт проекта “Атлас религиозного ландшафта Тюменской области”." />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Атлас религиозного ландшафта Тюменской области" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Сайт проекта “Атлас религиозного ландшафта Тюменской области”." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Атлас религиозного ландшафта Тюменской области" />
+  
+  <meta name="twitter:description" content="Сайт проекта “Атлас религиозного ландшафта Тюменской области”." />
+  
+
+<meta name="author" content="Максим Черепанов, Роман Поплавский, Гульнара Мавлютова, Владимир Костомаров, Александр Шелудков" />
+
+
+<meta name="date" content="2022-08-13" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+<link rel="next" href="interactive-map.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Атлас религиозного ландшафта Тюменской области</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> О проекте</a></li>
+<li class="chapter" data-level="2" data-path="interactive-map.html"><a href="interactive-map.html"><i class="fa fa-check"></i><b>2</b> Карта религиозных объединений</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="interactive-map.html"><a href="interactive-map.html#ислам"><i class="fa fa-check"></i><b>2.1</b> Ислам</a>
+<ul>
+<li class="chapter" data-level="" data-path="interactive-map.html"><a href="interactive-map.html#объединения"><i class="fa fa-check"></i>Объединения</a></li>
+<li class="chapter" data-level="" data-path="interactive-map.html"><a href="interactive-map.html#объекты"><i class="fa fa-check"></i>Объекты</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="interactive-map.html"><a href="interactive-map.html#христианство"><i class="fa fa-check"></i><b>2.2</b> Христианство</a>
+<ul>
+<li class="chapter" data-level="" data-path="interactive-map.html"><a href="interactive-map.html#объединения-1"><i class="fa fa-check"></i>Объединения</a></li>
+<li class="chapter" data-level="" data-path="interactive-map.html"><a href="interactive-map.html#объекты-1"><i class="fa fa-check"></i>Объекты</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="thematic-maps.html"><a href="thematic-maps.html"><i class="fa fa-check"></i><b>3</b> Тематические карты</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="thematic-maps.html"><a href="thematic-maps.html#карта-конфессиональной-представленности-территории"><i class="fa fa-check"></i><b>3.1</b> Карта конфессиональной представленности территории</a></li>
+<li class="chapter" data-level="3.2" data-path="thematic-maps.html"><a href="thematic-maps.html#объекты-с-охранным-статусом"><i class="fa fa-check"></i><b>3.2</b> Объекты с охранным статусом</a></li>
+<li class="chapter" data-level="3.3" data-path="thematic-maps.html"><a href="thematic-maps.html#религиозные-организации"><i class="fa fa-check"></i><b>3.3</b> Религиозные организации</a></li>
+<li class="chapter" data-level="3.4" data-path="thematic-maps.html"><a href="thematic-maps.html#религиозные-общины"><i class="fa fa-check"></i><b>3.4</b> Религиозные общины</a></li>
+<li class="chapter" data-level="3.5" data-path="thematic-maps.html"><a href="thematic-maps.html#религиозное-влияние"><i class="fa fa-check"></i><b>3.5</b> Религиозное влияние</a></li>
+<li class="chapter" data-level="3.6" data-path="thematic-maps.html"><a href="thematic-maps.html#площадки-внутриконфессиональных-отношений"><i class="fa fa-check"></i><b>3.6</b> Площадки внутриконфессиональных отношений</a></li>
+<li class="chapter" data-level="3.7" data-path="thematic-maps.html"><a href="thematic-maps.html#площадки-межконфессиональных-отношений"><i class="fa fa-check"></i><b>3.7</b> Площадки межконфессиональных отношений</a></li>
+<li class="chapter" data-level="3.8" data-path="thematic-maps.html"><a href="thematic-maps.html#паломнические-маршруты"><i class="fa fa-check"></i><b>3.8</b> Паломнические маршруты</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="publications.html"><a href="publications.html"><i class="fa fa-check"></i><b>4</b> Публикации</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Атлас религиозного ландшафта Тюменской области</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Атлас религиозного ландшафта Тюменской области</h1>
+<p class="author"><em>Максим Черепанов, Роман Поплавский, Гульнара Мавлютова, Владимир Костомаров, Александр Шелудков</em></p>
+<p class="date"><em>2022-08-13</em></p>
+</div>
+<div id="о-проекте" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">1</span> О проекте<a href="index.html#о-проекте" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>В современном мире религия остается одним из важных способов осмысления и упорядочивания жизни людей. С одной стороны, религиозные значения, длительное время бывшие основой культур человеческих общностей, исторически вплетены в ткань современной повседневности. С другой стороны, религиозные учения продолжают осознанно восприниматься людьми, обретая значимость в качестве систем мировоззренческого ориентирования. Знания о религиозном ландшафте – его структуре и динамике – особенно актуальны для многокультурных регионов, таких как Тюменская область.</p>
+<p><strong>Атлас религиозного ландшафта Тюменской области</strong> представляет результаты комплексного исследования, включавшего наблюдения, многочисленные интервью, анкетирование жителей и анализ документов. В работе впервые описана география религиозных объединений (православных, католических, протестантских, мусульманских, иудейских), культовых объектов и паломнических центров Тюменской области, дана социальная характеристика религиозных общин, показаны пространственные закономерности и пространственная динамика религиозного ландшафта региона, выделены очаги и зоны влияния религиозных центров. Полевые исследования по проекту проходили в 2021-2022 гг., однако при составлении карт авторы опирались на результаты своих работ, проводившихся на юге Тюменской области с 2005 года.</p>
+<p><a href="interactive-map.html#interactive-map">Карта религиозных объединений</a> в интерактивном режиме представляет информацию о современых религиозных организациях и группах, а также культовых объектах в Тюменской области. В разделе <a href="thematic-maps.html#thematic-maps">Тематические карты</a> представлены аналитические материалы по отдельным аспектам религиозного ландшафта региона.</p>
+<p><strong>Авторы проекта</strong>: <a href="https://orcid.org/0000-0003-2246-1329" target="_blank">Максим Черепанов</a>, <a href="https://orcid.org/0000-0003-4459-7104" target="_blank">Гульнара Мавлютова</a>, <a href="https://orcid.org/0000-0001-9492-0673" target="_blank">Роман Поплавский</a>, <a href="https://orcid.org/0000-0002-8667-3809" target="_blank">Владимир Костомаров</a>, <a href="https://orcid.org/0000-0001-5409-934X" target="_blank">Александр Шелудков</a>.</p>
+<p>Исследование поддержано грантом РФФИ и Тюменской области № 20-45-720004.</p>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="interactive-map.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
