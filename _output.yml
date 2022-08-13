@@ -4,6 +4,17 @@ bookdown::gitbook:
     toc:
       before: |
         <li><a href="./">Атлас религиозного ландшафта Тюменской области</a></li>
+    sharing:
+      facebook: false
+      github: false
+      twitter: false
+      linkedin: false
+      weibo: false
+      instapaper: false
+      vk: false
+      whatsapp: false
+      all: ['facebook', 'vk']
+
 #    edit: https://github.com/USERNAME/REPO/edit/BRANCH/%s
 #     download: ["pdf", "epub"]
 # bookdown::pdf_book:
