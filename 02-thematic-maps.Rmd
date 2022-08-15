@@ -1,5 +1,15 @@
 # Тематические карты {#thematic-maps}
 
+```{r libraries, include=FALSE}
+library(tidyverse)
+library(sf)
+library(leaflet)
+
+# Load data
+load("data/islam_full_sf.Rdata")
+
+```
+
 ## Конфессиональная представленность территории
 
 Карта отражает количество единиц определенных конфессий в тех или иных населенных пунктах и муниципальных районах. 
@@ -7,6 +17,39 @@
 ## Объекты с охранным статусом
 
 Карта показывает местонахождение культовых объектов с охранным статусом и их характеристики.
+
+```{r historical_objects, echo=FALSE, out.width="100%"}
+
+historical_objects_sf <- 
+  objects_sf %>% 
+  filter(Protected %in% c("объект культурного наследия регионального значения", 
+                          "Историческая мечеть 1778 года, реконструирована")) %>% 
+  # Add labels
+  mutate(label = paste0('<p>', '<strong>', str_wrap(Name, width = 40), '</strong>', '<p></p>',
+                        '<p>', str_wrap(Address, width = 40), '<p></p>',
+                        '<p>', str_wrap(Protected, width = 40), '<p></p>',
+                        '<p>', str_wrap(Date, width = 40), '<p></p>',
+                        '<p>','Религиозное объединение: ', '<br/>', 
+                        str_wrap(Community, width = 40), '<p></p>'))
+
+# Save labels to list
+labs <- historical_objects_sf$label %>% str_replace_all(.,"\n", "<br>") %>% as.list()
+
+# Leaflet map
+leaflet(data = historical_objects_sf) %>% 
+  setView(lng = 67.8, lat = 57.6, zoom = 7) %>% 
+  addTiles() %>% 
+  addMarkers(label = lapply(labs, htmltools::HTML), 
+             labelOptions = labelOptions(
+               style = list("font-weight" = "normal", padding = "3px 8px"),
+               textsize = "15px",
+               direction = "auto"),
+             clusterOptions = markerClusterOptions()) %>% 
+  addEasyButton(button = easyButton(
+    icon = htmltools::span(class = "curren", htmltools::HTML("&curren;")),
+    onClick = JS("function(btn, map){ map.setView([57.6, 67.8], 7);}")))
+
+```
 
 ## Внутриконфессиональные связи
 
