@@ -22,8 +22,7 @@ load("data/islam_full_sf.Rdata")
 
 historical_objects_sf <- 
   objects_sf %>% 
-  filter(Protected %in% c("объект культурного наследия регионального значения", 
-                          "Историческая мечеть 1778 года, реконструирована")) %>% 
+  filter(Protected %in% c("объект культурного наследия регионального значения")) %>% 
   # Add labels
   mutate(label = paste0('<p>', '<strong>', str_wrap(Name, width = 40), '</strong>', '<p></p>',
                         '<p>', str_wrap(Address, width = 40), '<p></p>',
