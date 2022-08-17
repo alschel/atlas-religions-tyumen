@@ -4,6 +4,8 @@
 library(tidyverse)
 library(sf)
 library(leaflet)
+library(basemaps)
+library(ggspatial)
 
 # Load data
 load("data/islam_full_sf.Rdata")
@@ -57,6 +59,36 @@ leaflet(data = historical_objects_sf) %>%
 ## Численность религиозных общин
 
 Местонахождение общин, маркируемых в зависимости от числа участников их молитвенных собраний.
+
+```{r communities size, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+
+# Recode data to address size
+objects_sf %>% 
+  mutate(Ordinary_size_val = recode(Ordinary_size, "наименьшая" = 50, "малая" = 200,
+                                    "средняя" = 500, "крупная" = 1000, 
+                                    "крупнейшая" = 2000)) %>% 
+  filter(!is.na(Ordinary_size_val)) -> objects_sf_size_val
+
+load("data/ne_region_border.Rdata")
+
+bsmp <- basemap_ggplot(region, map_service = "osm", map_type = "streets", map_res = 0.8, verbose = F)
+
+bsmp+
+  geom_sf(data = objects_sf_size_val %>% st_transform(crs = 3857), 
+          aes(geometry = geometry, size = Ordinary_size_val), 
+          shape = 21,  color = "darkgreen",
+          fill = NA)+
+  scale_size_binned("Численность\nмолитвенных\nсобраний, чел.", 
+                    breaks = c(50, 200, 500, 1000, 1500), limits = c(5, 1500), range = c(0.2, 10))+
+  geom_sf(data = region, col = "black", fill = NA, lwd = 0.3)+
+  annotation_scale()+
+  coord_sf(expand = F, datum = NA)+
+  theme_void(base_family = "Arial",base_size = 10)+
+  theme(legend.position = c(0.85, 0.25))
+
+```
+
+Крупнейшие исламские молитвенные собрания проходят в Мечети им. Умара ибн Хаттаба на ул. Жданова и Мечети Центрального духовного управления мусульман России по ул. Мельникайте в Тюмени, в Соборной мечети г. Тобольска. Еженедельно они собирают более 500 человек, а на праздничные молитвы - более тысячи.
 
 ## Зоны религиозного влияния
 
