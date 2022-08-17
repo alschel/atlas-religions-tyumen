@@ -12,6 +12,13 @@ load("data/islam_full_sf.Rdata")
 
 ```
 
+```{r basemap, include=FALSE}
+
+load("data/ne_region_border.Rdata")
+bsmp <- basemap_ggplot(region, map_service = "osm", map_type = "streets", map_res = 0.8, verbose = F)
+
+```
+
 ## Конфессиональная представленность территории
 
 Карта отражает количество единиц определенных конфессий в тех или иных населенных пунктах и муниципальных районах. 
@@ -56,9 +63,46 @@ leaflet(data = historical_objects_sf) %>%
 
 Карта представляет наличие связей между централизованными религиозными организациями и местными религиозными организациями, культовыми объектами, паломническими центрами.
 
+**Исламские сообщества**
+
+```{r central_organizations, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+
+# Prepare data
+central_orgs <- 
+  communities_sf %>% 
+  st_transform(crs = 3857) %>% 
+  mutate(Сentral_organization = replace_na(Сentral_organization, "нет"),
+            Сentral_organization = factor(Сentral_organization,
+                                        levels = c("Духовное управление мусульман Тюменской области",
+                                                   "Региональное духовное управление мусульман Тюменской области",
+                                                  "Центральное Духовное управление мусульман России",
+                                                  "нет"),
+                                        labels = str_wrap(c("Духовное управление мусульман Тюменской области",
+                                                   "Региональное духовное управление мусульман Тюменской области",
+                                                  "Центральное Духовное управление мусульман России",
+                                                  "нет"), 20)))
+
+bsmp+
+  geom_sf(data = central_orgs %>% 
+            st_transform(crs = 3857), 
+          aes(geometry = geometry, col = Сentral_organization), 
+          shape = 21, size = 1.5,
+          fill = NA)+
+  geom_sf(data = region, col = "black", fill = NA, lwd = 0.3)+
+  scale_color_discrete(name = "")+
+  annotation_scale()+
+  coord_sf(expand = F, datum = NA)+
+  theme_void(base_family = "Arial",base_size = 10)+
+  theme(legend.position = c(0.85, 0.25))
+
+```
+
+
 ## Численность религиозных общин
 
 Местонахождение общин, маркируемых в зависимости от числа участников их молитвенных собраний.
+
+**Исламские сообщества**
 
 ```{r communities size, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 
@@ -68,10 +112,6 @@ objects_sf %>%
                                     "средняя" = 500, "крупная" = 1000, 
                                     "крупнейшая" = 2000)) %>% 
   filter(!is.na(Ordinary_size_val)) -> objects_sf_size_val
-
-load("data/ne_region_border.Rdata")
-
-bsmp <- basemap_ggplot(region, map_service = "osm", map_type = "streets", map_res = 0.8, verbose = F)
 
 bsmp+
   geom_sf(data = objects_sf_size_val %>% st_transform(crs = 3857), 
