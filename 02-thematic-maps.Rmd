@@ -152,44 +152,77 @@ religious_data_full_aea %>%
 
 ```
 
-## Внутриконфессиональные связи
+## Централизованные религиозные организации
 
-Карта представляет наличие связей между централизованными религиозными организациями и местными религиозными организациями, культовыми объектами, паломническими центрами.
-
-**Исламские сообщества**
+**Исламские объединения**
 
 ```{r central_organizations, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 
-# Prepare data
-central_orgs <- 
-  religious_data_full_aea %>% 
-  filter(Confession == "ислам") %>% 
-  st_transform(crs = 3857) %>% 
+# 2.2.1. Ислам
+# Созраним в отдельный датасет
+religious_data_full_aea %>% 
+  # st_drop_geometry() %>% 
+  filter(Confession == "ислам", Type == "объединение") %>% 
+  mutate(Сentral_organization = replace_na(Сentral_organization, "-")) %>% 
   mutate(Сentral_organization = replace_na(Сentral_organization, "нет"),
-            Сentral_organization = factor(Сentral_organization,
-                                        levels = c("Духовное управление мусульман Тюменской области",
-                                                   "Региональное духовное управление мусульман Тюменской области",
+         Сentral_organization = factor(Сentral_organization,
+                                       levels = c("Духовное управление мусульман Тюменской области",
+                                                  "Региональное духовное управление мусульман Тюменской области",
                                                   "Центральное Духовное управление мусульман России",
-                                                  "нет"),
-                                        labels = str_wrap(c("Духовное управление мусульман Тюменской области",
-                                                   "Региональное духовное управление мусульман Тюменской области",
-                                                  "Центральное Духовное управление мусульман России",
-                                                  "нет"), 20)),
+                                                  "-"),
+                                       labels = str_wrap(c("Духовное управление мусульман Тюменской области",
+                                                           "Региональное духовное управление мусульман Тюменской области",
+                                                           "Центральное Духовное управление мусульман России",
+                                                           "-"), 20)),
          lon = st_coordinates(.)[,1],
-         lat = st_coordinates(.)[,2])
+         lat = st_coordinates(.)[,2]) -> central_orgs
 
-bsmp+
-  geom_sf(data = central_orgs %>% 
-            st_transform(crs = 3857), 
-          aes(geometry = geometry, col = Сentral_organization), 
-          shape = 21, size = 1.5,
-          fill = NA)+
-  geom_sf(data = region, col = "black", fill = NA, lwd = 0.3)+
-  scale_color_discrete(name = "")+
+# Для каждой орагнизации построим плотность, вытащим нижние слои и отдельно покажем их как полигоны слови
+
+dens_1 <-
+  central_orgs %>% 
+  filter(Сentral_organization == "Духовное управление\nмусульман Тюменской\nобласти") %>% 
+  ggplot()+
+  geom_density_2d(data = ,
+                  aes(x = lon, y = lat), colour = "red", contour_var = "count", linewidth = 0.2, n = 300, h = 100000)+
+  coord_sf(expand = T, datum = NA, crs = aea)
+layer_data(dens_1, 1L) %>% 
+  mutate(group1 = forcats::fct_rev(group) %>% as.integer()) %>%
+  filter(group1 %in% c(12:10)) -> area_1
+
+
+dens_2 <- central_orgs %>% 
+  filter(Сentral_organization == "Региональное\nдуховное управление\nмусульман Тюменской\nобласти") %>% 
+  ggplot()+
+  geom_density_2d(data = ,
+                  aes(x = lon, y = lat), colour = "steelblue3", contour_var = "count", linewidth = 0.2, n = 300, h = 100000)+
+  geom_point(data = central_orgs,
+             aes(x = lon, y = lat, color = Сentral_organization), size = 1)
+layer_data(dens_2, 1L) %>% 
+  mutate(group1 = forcats::fct_rev(group) %>% as.integer()) %>%
+  filter(group1 %in% c(6:7)) -> area_2
+
+ggplot() +
+  geom_sf(data = municipalities_aea, aes(geometry = geometry), 
+          col = "grey40", fill = NA, lwd = 0.3)+
+  geom_sf(data = tyumen_region_aea, aes(geometry = geometry),
+          col = "grey40", fill = NA, lwd = 0.5)+
+  geom_polygon(data = area_1, aes(x = x, y = y, group = group), fill = "#d44842", alpha = 0.1, colour = "#d44842", linewidth = 0.2)+
+  geom_polygon(data = area_2, aes(x = x, y = y, group = group), fill = "#277f8e", alpha = 0.1, colour = "#277f8e", linewidth = 0.2)+
+  geom_point(data = central_orgs,
+                  aes(x = lon, y = lat, 
+                      color = Сentral_organization, 
+                      fill = Сentral_organization,
+                      shape = Сentral_organization), size = 1, shape = 21)+
+  scale_color_manual(values = c("#d44842", "#277f8e", "#65156e", "black"))+
+  scale_fill_manual(name = "", values = c("#d44842", "#277f8e", "#65156e", "white"))+
   annotation_scale()+
-  coord_sf(expand = F, datum = NA)+
-  theme_void(base_family = "Arial",base_size = 10)+
-  theme(legend.position = c(0.85, 0.25))
+  coord_sf(expand = T, datum = NA, crs = aea)+
+  theme_void(base_family = "Arial",base_size = 12)+
+  theme(legend.position = c(0.85, 0.25),
+        legend.key.size = unit(1.4, "cm"))+
+  guides(fill = guide_legend(override.aes = list(stroke = c(0,0,0,0.5), size = 2)),
+         color = "none")
 
 ```
 
