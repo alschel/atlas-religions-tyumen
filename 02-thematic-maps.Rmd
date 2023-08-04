@@ -1,4 +1,4 @@
-# Тематические карты {#thematic-maps}
+# Тематические материалы и карты {#thematic-maps}
 
 ```{r libraries, include=FALSE}
 library(tidyverse)
@@ -8,7 +8,8 @@ library(basemaps)
 library(ggspatial)
 
 # Load data
-load("data/islam_full_sf.Rdata")
+load("data/basemap_objects.Rdata")
+load("data/religious_data_full_aea.Rdata")
 
 ```
 
@@ -19,43 +20,135 @@ bsmp <- basemap_ggplot(region, map_service = "osm", map_type = "streets", map_re
 
 ```
 
-## Конфессиональная представленность территории
+Общее интро о том, как какие конфессии есть в регионе и как они появились.
 
-Карта отражает количество единиц определенных конфессий в тех или иных населенных пунктах и муниципальных районах.
+## Численность религиозных общин
 
-## Объекты с охранным статусом
+**Религиозные общины по числу участников еженедельных молитвенных собраний**
 
-Карта показывает местонахождение культовых объектов с охранным статусом и их характеристики.
+```{r heatmap, echo=FALSE, out.width="75%"}
 
-```{r historical_objects, echo=FALSE, out.width="100%"}
+religious_data_full_aea %>% 
+  st_drop_geometry() %>% 
+  filter(Type == "объект") %>% 
+  drop_na(Ordinary_size, Ordinary_size_val) %>% 
+  group_by(Confession, Ordinary_size) %>% 
+  count() %>% 
+  mutate(Confession = factor(Confession, levels = c("иудаизм", "католицизм", "православие", "ислам"))) %>% 
+  ggplot(aes(x = Ordinary_size, y = Confession))+
+  geom_tile(aes(fill = n), col = "black", alpha = 0.6, show.legend = F)+
+  geom_text(aes(label = n))+
+  scale_fill_viridis_c(trans = "pseudo_log", direction = 1)+
+  scale_x_discrete(position = "top", labels = c("наименьшая\n(<50)", "малая\n(50-200)", "средняя\n(200-500)", "крупная\n(500-1000)", "крупнейшая\n(>1000)"))+
+  coord_equal()+
+  theme_classic(base_size = 12, base_family = "Arial")+
+  theme(axis.title = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank())
 
-historical_objects_sf <- 
-  objects_sf %>% 
-  filter(Protected %in% c("объект культурного наследия регионального значения")) %>% 
-  # Add labels
-  mutate(label = paste0('<p>', '<strong>', str_wrap(Name, width = 40), '</strong>', '<p></p>',
-                        '<p>', str_wrap(Address, width = 40), '<p></p>',
-                        '<p>', str_wrap(Protected, width = 40), '<p></p>',
-                        '<p>', str_wrap(Date, width = 40), '<p></p>',
-                        '<p>','Религиозное объединение: ', '<br/>', 
-                        str_wrap(Community, width = 40), '<p></p>'))
+```
 
-# Save labels to list
-labs <- historical_objects_sf$label %>% str_replace_all(.,"\n", "<br>") %>% as.list()
+**Ислам**
 
-# Leaflet map
-leaflet(data = historical_objects_sf) %>% 
-  setView(lng = 67.8, lat = 57.6, zoom = 7) %>% 
-  addTiles() %>% 
-  addMarkers(label = lapply(labs, htmltools::HTML), 
-             labelOptions = labelOptions(
-               style = list("font-weight" = "normal", padding = "3px 8px"),
-               textsize = "15px",
-               direction = "auto"),
-             clusterOptions = markerClusterOptions()) %>% 
-  addEasyButton(button = easyButton(
-    icon = htmltools::span(class = "curren", htmltools::HTML("&curren;")),
-    onClick = JS("function(btn, map){ map.setView([57.6, 67.8], 7);}")))
+Крупнейшие исламские молитвенные собрания проходят в Мечети им. Умара ибн Хаттаба на ул. Жданова и Мечети Центрального духовного управления мусульман России по ул. Мельникайте в городе Тюмени, в Соборной мечети г. Тобольска. Еженедельно они собирают около 500 человек, а на праздничные молитвы - более тысячи.
+
+```{r communities size islam, echo=FALSE, message=FALSE, warning=FALSE, out.width="80%", fig.align='center'}
+
+religious_data_full_aea %>% 
+  filter(Type == "объект", Confession == "ислам") %>% 
+  ggplot()+
+  geom_sf(data = municipalities_aea, aes(geometry = geometry), 
+          col = "grey40", fill = NA, lwd = 0.3)+
+  geom_sf(data = tyumen_region_aea, aes(geometry = geometry),
+          col = "grey40", fill = NA, lwd = 0.5)+
+  geom_sf(aes(geometry = geometry, size = Ordinary_size_val), 
+          shape = 21, stroke = 0.5, fill = alpha("forestgreen", 0.5), color = "black")+
+  scale_size_binned("Численность\nмолитвенных\nсобраний, чел.", 
+                    breaks = c(50, 200, 500, 1000, 1500), limits = c(5, 1500), range = c(0.3, 12))+
+  annotation_scale()+
+  # scale_color_manual(values = c("forestgreen", "red", "steelblue4", "darkmagenta"))+
+  coord_sf(expand = F, datum = NA)+
+  theme_void(base_family = "Arial",base_size = 10)+
+  theme(legend.position = c(0.85, 0.29))+
+  guides(color = "none")
+
+```
+
+**Православие**
+
+В Тюменской области свыше 170 действующих храмов. Крупнейшие из них: Знаменский кафедральный собор в Тюмени и Троицкий собор на территории Епархиального Свято-Троицкого мужского монастыря в Тюмени. В Вербное воскресенье и на Пасху Знаменский собор посещают две-четыре тысячи человек.
+
+```{r communities size orthodox, echo=FALSE, message=FALSE, warning=FALSE, out.width="80%", fig.align='center'}
+
+religious_data_full_aea %>% 
+  filter(Type == "объект", Confession == "православие") %>% 
+  ggplot()+
+  geom_sf(data = municipalities_aea, aes(geometry = geometry), 
+          col = "grey40", fill = NA, lwd = 0.3)+
+  geom_sf(data = tyumen_region_aea, aes(geometry = geometry),
+          col = "grey40", fill = NA, lwd = 0.5)+
+  geom_sf(aes(geometry = geometry, size = Ordinary_size_val), 
+          shape = 21, stroke = 0.5, fill = alpha("red", 0.5), color = "black")+
+  scale_size_binned("Численность\nмолитвенных\nсобраний, чел.", 
+                    breaks = c(50, 200, 500, 1000, 1500), limits = c(5, 1500), range = c(0.3, 12))+
+  annotation_scale()+
+  # scale_color_manual(values = c("forestgreen", "red", "steelblue4", "darkmagenta"))+
+  coord_sf(expand = F, datum = NA)+
+  theme_void(base_family = "Arial",base_size = 10)+
+  theme(legend.position = c(0.85, 0.29))+
+  guides(color = "none")
+
+```
+
+**Католицизм**
+
+В регионе пять католических церквей - в Тюмени, Тобольске, Ишиме, в с. Омутинка и поселке Голышманово.
+
+```{r communities size catholic, echo=FALSE, message=FALSE, warning=FALSE, out.width="80%", fig.align='center'}
+
+religious_data_full_aea %>% 
+  filter(Type == "объект", Confession == "католицизм") %>% 
+  ggplot()+
+  geom_sf(data = municipalities_aea, aes(geometry = geometry), 
+          col = "grey40", fill = NA, lwd = 0.3)+
+  geom_sf(data = tyumen_region_aea, aes(geometry = geometry),
+          col = "grey40", fill = NA, lwd = 0.5)+
+  geom_sf(aes(geometry = geometry, size = Ordinary_size_val), 
+          shape = 21, stroke = 0.5, fill = alpha("steelblue3", 0.5), color = "black")+
+  scale_size_binned("Численность\nмолитвенных\nсобраний, чел.", 
+                    breaks = c(50, 200, 500, 1000, 1500), limits = c(5, 1500), range = c(0.3, 12))+
+  annotation_scale()+
+  # scale_color_manual(values = c("forestgreen", "red", "steelblue4", "darkmagenta"))+
+  coord_sf(expand = F, datum = NA)+
+  theme_void(base_family = "Arial",base_size = 10)+
+  theme(legend.position = c(0.85, 0.29))+
+  guides(color = "none")
+
+```
+
+**Иудаизм**
+
+Тюменская синагога построена в 1912 году, открыта после реставрации в 2001 году. 
+
+```{r communities size iudaism, echo=FALSE, message=FALSE, warning=FALSE, out.width="80%", fig.align='center'}
+
+religious_data_full_aea %>% 
+  filter(Type == "объект", Confession == "иудаизм") %>% 
+  ggplot()+
+  geom_sf(data = municipalities_aea, aes(geometry = geometry), 
+          col = "grey40", fill = NA, lwd = 0.3)+
+  geom_sf(data = tyumen_region_aea, aes(geometry = geometry),
+          col = "grey40", fill = NA, lwd = 0.5)+
+  geom_sf(aes(geometry = geometry, size = Ordinary_size_val), 
+          shape = 21, stroke = 0.5, fill = alpha("darkmagenta", 0.5), color = "black")+
+  scale_size_binned("Численность\nмолитвенных\nсобраний, чел.", 
+                    breaks = c(50, 200, 500, 1000, 1500), limits = c(5, 1500), range = c(0.3, 12))+
+  annotation_scale()+
+  # scale_color_manual(values = c("forestgreen", "red", "steelblue4", "darkmagenta"))+
+  coord_sf(expand = F, datum = NA)+
+  theme_void(base_family = "Arial",base_size = 10)+
+  theme(legend.position = c(0.85, 0.29))+
+  guides(color = "none")
 
 ```
 
@@ -69,7 +162,8 @@ leaflet(data = historical_objects_sf) %>%
 
 # Prepare data
 central_orgs <- 
-  communities_sf %>% 
+  religious_data_full_aea %>% 
+  filter(Confession == "ислам") %>% 
   st_transform(crs = 3857) %>% 
   mutate(Сentral_organization = replace_na(Сentral_organization, "нет"),
             Сentral_organization = factor(Сentral_organization,
@@ -80,7 +174,9 @@ central_orgs <-
                                         labels = str_wrap(c("Духовное управление мусульман Тюменской области",
                                                    "Региональное духовное управление мусульман Тюменской области",
                                                   "Центральное Духовное управление мусульман России",
-                                                  "нет"), 20)))
+                                                  "нет"), 20)),
+         lon = st_coordinates(.)[,1],
+         lat = st_coordinates(.)[,2])
 
 bsmp+
   geom_sf(data = central_orgs %>% 
@@ -97,38 +193,44 @@ bsmp+
 
 ```
 
-## Численность религиозных общин
-
-Местонахождение общин, маркируемых в зависимости от числа участников их молитвенных собраний.
-
-**Исламские сообщества**
-
-```{r communities size, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-
-# Recode data to address size
-objects_sf %>% 
-  mutate(Ordinary_size_val = recode(Ordinary_size, "наименьшая" = 50, "малая" = 200,
-                                    "средняя" = 500, "крупная" = 1000, 
-                                    "крупнейшая" = 2000)) %>% 
-  filter(!is.na(Ordinary_size_val)) -> objects_sf_size_val
-
-bsmp+
-  geom_sf(data = objects_sf_size_val %>% st_transform(crs = 3857), 
-          aes(geometry = geometry, size = Ordinary_size_val), 
-          shape = 21,  color = "darkgreen",
-          fill = NA)+
-  scale_size_binned("Численность\nмолитвенных\nсобраний, чел.", 
-                    breaks = c(50, 200, 500, 1000, 1500), limits = c(5, 1500), range = c(0.2, 10))+
-  geom_sf(data = region, col = "black", fill = NA, lwd = 0.3)+
-  annotation_scale()+
-  coord_sf(expand = F, datum = NA)+
-  theme_void(base_family = "Arial",base_size = 10)+
-  theme(legend.position = c(0.85, 0.25))
-
-```
-
-Крупнейшие исламские молитвенные собрания проходят в Мечети им. Умара ибн Хаттаба на ул. Жданова и Мечети Центрального духовного управления мусульман России по ул. Мельникайте в Тюмени, в Соборной мечети г. Тобольска. Еженедельно они собирают около 500 человек, а на праздничные молитвы - более тысячи.
-
 ## Зоны религиозного влияния
 
 Карта показывает населенные пункты, где проводят обряды религиозные специалисты той или иной общины, а также откуда приходят участники обрядов в культовый объект той или иной местности.
+
+## Объекты с охранным статусом
+
+В Тюменской области  четырнадцать религиозных объектов признаны объектами культурного наследия федерального уровня и еще двадцать девять религиозных объектов -- объектами культурного наследия регионального значения. Самый ранний из них -  Знаменский собор на территории Свято-Знаменского мужского монастыря в с. Абалак Тобольского района,  построен в 1683 году. 
+
+```{r historical_objects, echo=FALSE, out.width="100%"}
+
+historical_objects_sf <- 
+  religious_data_full_aea %>% 
+  st_transform(crs = 4326) %>% 
+  filter(Protected %in% c("объект культурного наследия регионального значения", "объект культурного наследия федерального значения")) %>% 
+  # Add labels
+  mutate(label = paste0('<p>', '<strong>', str_wrap(Name, width = 40), '</strong>', '<p></p>',
+                        '<p>', str_wrap(Address, width = 40), '<p></p>',
+                        '<p>', str_wrap(Protected, width = 40), '<p></p>',
+                        '<p>', str_wrap(Date, width = 40), '<p></p>',
+                        '<p>','Религиозное объединение: ', '<br/>', 
+                        str_wrap(Community, width = 40), '<p></p>'))
+
+# Save labels to list
+labs <- historical_objects_sf$label %>% str_replace_all(.,"\n", "<br>") %>% as.list()
+
+# Leaflet map
+leaflet(data = historical_objects_sf) %>% 
+  setView(lng = 67.8, lat = 57, zoom = 7) %>% 
+  addTiles() %>% 
+  addMarkers(label = lapply(labs, htmltools::HTML), 
+             labelOptions = labelOptions(
+               style = list("font-weight" = "normal", padding = "3px 8px"),
+               textsize = "15px",
+               direction = "auto"),
+             clusterOptions = markerClusterOptions()) %>% 
+  addEasyButton(button = easyButton(
+    icon = htmltools::span(class = "curren", htmltools::HTML("&curren;")),
+    onClick = JS("function(btn, map){ map.setView([57.6, 67.8], 7);}")))
+
+```
+
