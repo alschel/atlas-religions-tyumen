@@ -202,6 +202,22 @@ layer_data(dens_2, 1L) %>%
   mutate(group1 = forcats::fct_rev(group) %>% as.integer()) %>%
   filter(group1 %in% c(6:7)) -> area_2
 
+heat_map <- central_orgs %>%
+  st_drop_geometry() %>% 
+  group_by(Сentral_organization) %>% 
+  count() %>% 
+  ggplot(aes(x = Сentral_organization, fill = Сentral_organization, y = 1))+
+  geom_tile(show.legend = F, col = "black", linewidth = 0.4, alpha = 0.5)+
+  geom_text(aes(label = n), size = 3)+
+  coord_equal()+
+  scale_fill_manual(values = c("#d44842", "#277f8e", "#65156e", "white"))+
+  theme_classic(base_size = 12, base_family = "Arial")+
+  theme(axis.title = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
+  
+
 ggplot() +
   geom_sf(data = municipalities_aea, aes(geometry = geometry), 
           col = "grey40", fill = NA, lwd = 0.3)+
@@ -222,7 +238,9 @@ ggplot() +
   theme(legend.position = c(0.85, 0.25),
         legend.key.size = unit(1.4, "cm"))+
   guides(fill = guide_legend(override.aes = list(stroke = c(0,0,0,0.5), size = 2)),
-         color = "none")
+         color = "none")+
+  annotation_custom(ggplotGrob(heat_map), xmin = 18075740, xmax = 18341000, 
+                    ymin = 6047433, ymax = 6107433)
 
 ```
 
