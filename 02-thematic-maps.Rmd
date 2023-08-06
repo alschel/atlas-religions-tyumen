@@ -156,9 +156,8 @@ religious_data_full_aea %>%
 
 **Исламские объединения**
 
-```{r central_organizations, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+```{r central_organizations_islam, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 
-# 2.2.1. Ислам
 # Созраним в отдельный датасет
 religious_data_full_aea %>% 
   # st_drop_geometry() %>% 
@@ -175,12 +174,11 @@ religious_data_full_aea %>%
                                                            "Центральное Духовное управление мусульман России",
                                                            "-"), 20)),
          lon = st_coordinates(.)[,1],
-         lat = st_coordinates(.)[,2]) -> central_orgs
+         lat = st_coordinates(.)[,2]) -> central_orgs_islam
 
 # Для каждой орагнизации построим плотность, вытащим нижние слои и отдельно покажем их как полигоны слови
-
 dens_1 <-
-  central_orgs %>% 
+  central_orgs_islam %>% 
   filter(Сentral_organization == "Духовное управление\nмусульман Тюменской\nобласти") %>% 
   ggplot()+
   geom_density_2d(data = ,
@@ -191,18 +189,17 @@ layer_data(dens_1, 1L) %>%
   filter(group1 %in% c(12:10)) -> area_1
 
 
-dens_2 <- central_orgs %>% 
+dens_2 <- central_orgs_islam %>% 
   filter(Сentral_organization == "Региональное\nдуховное управление\nмусульман Тюменской\nобласти") %>% 
   ggplot()+
   geom_density_2d(data = ,
-                  aes(x = lon, y = lat), colour = "steelblue3", contour_var = "count", linewidth = 0.2, n = 300, h = 100000)+
-  geom_point(data = central_orgs,
-             aes(x = lon, y = lat, color = Сentral_organization), size = 1)
+                  aes(x = lon, y = lat), colour = "steelblue3", contour_var = "count", linewidth = 0.2, n = 300, h = 100000)
 layer_data(dens_2, 1L) %>% 
   mutate(group1 = forcats::fct_rev(group) %>% as.integer()) %>%
   filter(group1 %in% c(6:7)) -> area_2
 
-heat_map <- central_orgs %>%
+# Heatmap
+heatmap_islam <- central_orgs_islam %>%
   st_drop_geometry() %>% 
   group_by(Сentral_organization) %>% 
   count() %>% 
@@ -225,7 +222,7 @@ ggplot() +
           col = "grey40", fill = NA, lwd = 0.5)+
   geom_polygon(data = area_1, aes(x = x, y = y, group = group), fill = "#d44842", alpha = 0.1, colour = "#d44842", linewidth = 0.2)+
   geom_polygon(data = area_2, aes(x = x, y = y, group = group), fill = "#277f8e", alpha = 0.1, colour = "#277f8e", linewidth = 0.2)+
-  geom_point(data = central_orgs,
+  geom_point(data = central_orgs_islam,
                   aes(x = lon, y = lat, 
                       color = Сentral_organization, 
                       fill = Сentral_organization,
@@ -239,7 +236,73 @@ ggplot() +
         legend.key.size = unit(1.4, "cm"))+
   guides(fill = guide_legend(override.aes = list(stroke = c(0,0,0,0.5), size = 2)),
          color = "none")+
-  annotation_custom(ggplotGrob(heat_map), xmin = 18075740, xmax = 18341000, 
+  annotation_custom(ggplotGrob(heatmap_islam), xmin = 18075740, xmax = 18341000, 
+                    ymin = 6047433, ymax = 6107433)
+
+```
+
+**Объединения православных христиан**
+
+```{r central_organizations_pravoslavie, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+
+# Сохраним в отдельный датасет
+religious_data_full_aea %>% 
+  # st_drop_geometry() %>%
+  filter(Confession == "православие", Type == "объединение") %>%
+  mutate(Сentral_organization = factor(Сentral_organization,
+                                       levels = c("Тобольско-Тюменская епархия РПЦ (МП)",
+                                                  "Ишимская епархия РПЦ (МП)",
+                                                  "Российская и Ново-Нахичеванская Епархия Святой Армянской Апостольской Православной Церкви"),
+                                       labels = str_wrap(c("Тобольско-Тюменская епархия РПЦ (МП)",
+                                                           "Ишимская епархия РПЦ (МП)",
+                                                           "Российская и Ново-Нахичеванская Епархия Святой Армянской Апостольской Православной Церкви"), 
+                                                         20)),
+         lon = st_coordinates(.)[,1],
+         lat = st_coordinates(.)[,2]) -> central_orgs_pravoslavie
+
+municipalities_aea <-
+  municipalities_aea %>% 
+  mutate(Central_org_pravoslavie = case_when(
+    str_detect(name, paste(c("Бердюжский", "Сладковский","Казанский", "Ишимский", "Юргинский",
+                             "Абатский","Голышмановский", "Викуловский","Аромашевский", 
+                             "Омутинский", "Армизонский", "Ишим", "Сорокинский"), collapse = "|")) ~ "Ишимская епархия РПЦ\n(МП)",
+    T ~ "Тобольско-Тюменская\nепархия РПЦ (МП)"))
+
+
+# Heatmap
+heatmap_pravoslavie <- 
+  central_orgs_pravoslavie %>%
+  st_drop_geometry() %>% 
+  group_by(Сentral_organization) %>% 
+  count() %>% 
+  ggplot(aes(x = Сentral_organization, fill = Сentral_organization, y = 1))+
+  geom_tile(show.legend = F, col = "black", linewidth = 0.4, alpha = 0.5)+
+  geom_text(aes(label = n), size = 3)+
+  coord_equal()+
+  scale_fill_manual(values = c("#d44842", "#277f8e", "#65156e", "white"))+
+  theme_classic(base_size = 12, base_family = "Arial")+
+  theme(axis.title = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
+
+
+ggplot() +
+  geom_sf(data = municipalities_aea, 
+          aes(geometry = geometry, fill = Central_org_pravoslavie), 
+          col = "grey40", lwd = 0.3, alpha = 0.25, show.legend = F)+
+  geom_sf(data = tyumen_region_aea, aes(geometry = geometry),
+          col = "grey40", fill = NA, lwd = 0.5)+
+  geom_point(data = central_orgs_pravoslavie,
+             aes(x = lon, y = lat, color = Сentral_organization), size = 1)+
+  scale_fill_manual(name = "", values = c( "#277f8e", "#d44842", "#65156e"))+
+  scale_color_manual(name = "", values = c("#d44842", "#277f8e", "#65156e"))+
+  annotation_scale()+
+  coord_sf(expand = T, datum = NA, crs = aea)+
+  theme_void(base_family = "Arial",base_size = 12)+
+  theme(legend.position = c(0.85, 0.27),
+        legend.key.size = unit(1.3, "cm"))+
+  annotation_custom(ggplotGrob(heatmap_pravoslavie), xmin = 18075740, xmax = 18341000, 
                     ymin = 6047433, ymax = 6107433)
 
 ```
