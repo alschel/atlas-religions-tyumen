@@ -1,4 +1,5 @@
 о-проекте
+general-description
 interactive-map
 thematic-maps
 численность-религиозных-общин
