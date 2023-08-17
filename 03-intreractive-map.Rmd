@@ -5,9 +5,9 @@
 .link_prev {display: none;}
 ```
 
+[**Открыть в полноэкранном режиме**](https://alschel.github.io/arlto-interactive-map/){target="_blank"}
+
 ```{r echo=FALSE, out.height="700px", out.width="100%"}
-# automatically create a bib database for R packages 
 knitr::include_url("https://alschel.github.io/arlto-interactive-map/", height = "700px")
 ```
 
-[Открыть в полноэкранном режиме](https://alschel.github.io/arlto-interactive-map/){target="_blank"}
