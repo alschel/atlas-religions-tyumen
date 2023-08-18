@@ -6,4 +6,3 @@ thematic-maps
 централизованные-религиозные-организации
 объекты-с-охранным-статусом
 publications
-url-your-book-url-like-httpsbookdown.orgyihuibookdown
